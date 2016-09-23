@@ -29,7 +29,7 @@ namespace CoursesAPI.Services.Services
 			_persons              = _uow.GetRepository<Person>();
 			objectsPerPage = 10;
 			pageCount = 0;
-			pageNumber = 0;
+			pageNumber = 1;
 		}
 
 		/// <summary>
@@ -51,7 +51,7 @@ namespace CoursesAPI.Services.Services
 		/// </summary>
 		/// <param name="semester"></param>
 		/// <returns></returns>
-		public dynamic GetCourseInstancesBySemester(string semester = null)
+		public dynamic GetCourseInstancesBySemester(string semester = null, int page = 1)
 		{
 
 			if (string.IsNullOrEmpty(semester))
@@ -79,9 +79,15 @@ namespace CoursesAPI.Services.Services
 					select p.Name
 				).SingleOrDefault() ?? "";
 			}
-			
+
+			//If you input an invalid page number you always get the default page
+			if(page <= 0)
+				pageNumber = 1;
+			else
+				pageNumber = page;
+
 			var items = courses
-				.Skip(objectsPerPage * pageNumber)
+				.Skip(objectsPerPage * (pageNumber - 1))
 				.Take(objectsPerPage)
 				.ToList();
 
@@ -91,6 +97,15 @@ namespace CoursesAPI.Services.Services
 			//Very sloppy way of doing things I know.
 			if(itemSize % 10 != 0)
 				pageCount++;
+
+			//If you input an invalid page number you always get the default page
+			if(page > pageCount){
+				pageNumber = 1;
+				items = courses
+				.Skip(objectsPerPage * (pageNumber - 1))
+				.Take(objectsPerPage)
+				.ToList();
+			}
 
 			var paging = new {	
 						PageCount          = pageCount,
@@ -103,8 +118,6 @@ namespace CoursesAPI.Services.Services
 					Items    = items,
 					Paging   = paging
 			};
-
-			pageNumber++;
 
 			return envelope;
 		}
