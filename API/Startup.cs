@@ -16,12 +16,16 @@ namespace WebApplication
 {
     public class Startup
     {
+        private string _rootFolder;
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+                _rootFolder = env.ContentRootPath;
 
             if (env.IsDevelopment())
             {
@@ -40,14 +44,12 @@ namespace WebApplication
         {
             // Add framework services.
             services.AddDbContext<AppDataContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlite($"Data Source={_rootFolder}/CourseDB.db"));
 
             services.AddMvc();
 
             // Add application services.
-//            services.AddTransient<IEmailSender, AuthMessageSender>();
-//            services.AddTransient<ISmsSender, AuthMessageSender>();
-			services.AddTransient<IUnitOfWork, UnitOfWork<AppDataContext>>();
+			services.AddTransient<IUnitOfWork, UnitOfWork>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

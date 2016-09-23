@@ -15,7 +15,7 @@ namespace CoursesAPI.Services.DataAccess
 	/// var result = service.getAll();
 	/// </summary>
 	/// <typeparam name="TContext"></typeparam>
-	public class UnitOfWork<TContext> : IUnitOfWork where TContext : IDbContext, new()
+	public class UnitOfWork : IUnitOfWork
 	{
 		#region Member variables
 		private readonly IDbContext               _ctx;
@@ -26,9 +26,9 @@ namespace CoursesAPI.Services.DataAccess
 		/// <summary>
 		/// Constructor that initializes the context and Repository dictionary
 		/// </summary>
-		public UnitOfWork()
+		public UnitOfWork(AppDataContext dbContext)
 		{
-			_ctx = new TContext();
+			_ctx = dbContext;
 			_repositories = new Dictionary<Type, object>();
 			_disposed = false;
 		}

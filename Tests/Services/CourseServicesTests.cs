@@ -20,27 +20,12 @@ namespace CoursesAPI.Tests.Services
 		private const string SSN_GUNNA   = "1234567890";
 		private const string INVALID_SSN = "9876543210";
 
-		private const string NAME_DABS = "Daníel B. Sigurgeirsson";
 		private const string NAME_GUNNA  = "Guðrún Guðmundsdóttir";
 
 		private const int COURSEID_VEFT_20153 = 1337;
 		private const int COURSEID_VEFT_20163 = 1338;
 		private const int INVALID_COURSEID    = 9999;
 
-		CourseInstance VEFT_20153 = new CourseInstance
-		{
-			ID         = COURSEID_VEFT_20153,
-			CourseID   = "T-514-VEFT",
-			SemesterID = "20153"
-		};
-
-		CourseInstance VEFT_20163 = new CourseInstance
-		{
-			ID         = COURSEID_VEFT_20163,
-			CourseID   = "T-514-VEFT",
-			SemesterID = "20163"
-		};
-		
 		public CourseServicesTests()
 		{
 			_mockUnitOfWork = new MockUnitOfWork<MockDataContext>();
@@ -53,7 +38,7 @@ namespace CoursesAPI.Tests.Services
 				new Person
 				{
 					ID    = 1,
-					Name  = NAME_DABS,
+					Name  = "Daníel B. Sigurgeirsson",
 					SSN   = SSN_DABS,
 					Email = "dabs@ru.is"
 				},
@@ -83,8 +68,18 @@ namespace CoursesAPI.Tests.Services
 			#region Courses
 			var courses = new List<CourseInstance>
 			{
-				VEFT_20153,
-				VEFT_20163
+				new CourseInstance
+				{
+					ID         = COURSEID_VEFT_20153,
+					CourseID   = "T-514-VEFT",
+					SemesterID = "20153"
+				},
+				new CourseInstance
+				{
+					ID         = COURSEID_VEFT_20163,
+					CourseID   = "T-514-VEFT",
+					SemesterID = "20163"
+				}
 			};
 			#endregion
 
@@ -111,115 +106,23 @@ namespace CoursesAPI.Tests.Services
 
 			_service = new CoursesServiceProvider(_mockUnitOfWork);
 		}
-		
+
 		#region GetCoursesBySemester
 		/// <summary>
-		/// Grabs all courses from an empty list of courses
-		/// Result is an empty list (surprise!)
+		/// TODO: implement this test, and several others!
 		/// </summary>
 		[Fact]
 		public void GetCoursesBySemester_ReturnsEmptyListWhenNoDataDefined()
 		{
-			// Arrange:			
-			_mockUnitOfWork.SetRepositoryData(new List<CourseInstance>{});
+			// Arrange:
 
 			// Act:
-			var result = _service.GetCourseInstancesBySemester();
 
 			// Assert:
-			Assert.Empty(result);
+			// Assert.True(true);
 		}
 
-		//	(10%) 	The function should return all courses on a given semester (no more, no less!)
-		/// <summary>
-		///	Grabs all courses with semester = "20163"
-		/// This should return a single course with ID = COURSEID_VEFT_20163
-		/// MainTeacher should be unassigned (empty string)
-		/// </summary>
-		[Fact]
-		public void GetCoursesBySemester_ReturnsAllCoursesOnGivenSemester()
-		{
-			// Arrange: N/A		
-
-			// Act:
-			var result = _service.GetCourseInstancesBySemester("20163");
-
-			// Assert:
-			Assert.Single(result); 
-			Assert.Equal(VEFT_20163.ID, result[0].CourseInstanceID);			
-			Assert.Equal("", result[0].MainTeacher);
-		}
-
-		//	(10%) 	If no semester is defined, it should return all courses for the semester 20153
-		/// <summary>
-		///	Grabs all courses with semester = "20153"
-		/// This should return a single course with ID = COURSEID_VEFT_20153		
-		/// </summary>
-		[Fact]
-		public void GetCoursesBySemester_ReturnsAllCoursesOnDefaultSemester()
-		{
-			// Arrange: N/A		
-
-			// Act:
-			var result = _service.GetCourseInstancesBySemester();
-
-			// Assert:
-			Assert.Single(result); 
-			Assert.Equal(VEFT_20153.ID, result[0].CourseInstanceID);
-		}
-
-		//	(10%) 	For each course returned, the name of the main teacher of the course should be 
-		//			included (see the definition of CourseInstanceDTO).
-		/// <summary>
-		///	Grabs all courses with semester = "20153"
-		/// This should return a single course with ID = COURSEID_VEFT_20153
-		/// MainTeacher should be equal to NAME_DABS
-		/// </summary>
-		[Fact]
-		public void GetCoursesBySemester_ReturnsCourseWithDefinedMainTeacher()
-		{
-			// Arrange: N/A
-
-			// Act:
-			var result2015 = _service.GetCourseInstancesBySemester("20153");
-			var result2016 = _service.GetCourseInstancesBySemester("20163");
-
-			// Assert:
-			// Asserting that we have a single result
-			Assert.Single(result2015);						 
-			// Asserting that we have the right course returned
-			Assert.Equal(VEFT_20153.ID, result2015[0].CourseInstanceID);			
-			// Asserting that the name of the mainTeacher is equals to NAME_DABS
-			Assert.Equal(NAME_DABS, result2015[0].MainTeacher);
-			
-		}
-
-		//	(10%) 	If the main teacher hasn't been defined, the name of the main teacher should 
-		//			be returned as an empty string.
-		/// <summary>
-		///	Grabs all courses with semester = "20163"
-		/// This should return a single course with ID = COURSEID_VEFT_20163
-		/// MainTeacher should be an empty string
-		/// </summary>
-		[Fact]
-		public void GetCoursesBySemester_ReturnsCourseWithUndefinedMainTeacher()
-		{
-			// Arrange: N/A
-
-			// Act:			
-			var result2016 = _service.GetCourseInstancesBySemester("20163");
-
-			// Assert:
-			// Asserting that we have a single result			
-			Assert.Single(result2016);			 
-			// Asserting that we have the right course returned			
-			Assert.Equal(VEFT_20163.ID, result2016[0].CourseInstanceID);
-			// Asserting that we have an empty string returned			
-			Assert.Equal("", result2016[0].MainTeacher);
-		}
-		//	(10%)	Finally, the code is not correct when it comes to returning the name of the main teacher. You should:
-		//			Write the unit tests for this functionality (which should fail) Modify the code until the tests pass.
-		// DONE AND DONE!
+		// TODO!!! you should write more unit tests here!!!
 
 		#endregion
 
@@ -238,7 +141,7 @@ namespace CoursesAPI.Tests.Services
 				SSN  = SSN_GUNNA,
 				Type = TeacherType.MainTeacher
 			};
-			var prevCount = _teacherRegistrations.Count;			
+			var prevCount = _teacherRegistrations.Count;
 			// Note: the method uses test data defined in [TestInitialize]
 
 			// Act:

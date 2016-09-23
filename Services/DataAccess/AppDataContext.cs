@@ -5,6 +5,11 @@ namespace CoursesAPI.Services.DataAccess
 {
 	public class AppDataContext : DbContext, IDbContext
 	{
+		public AppDataContext(DbContextOptions<AppDataContext> options)
+		: base(options)
+		{
+		}
+
 		public DbSet<Person>              Persons              { get; set; }
 		public DbSet<Semester>            Semesters            { get; set; }
 		public DbSet<CourseTemplate>      CourseTemplates      { get; set; }
