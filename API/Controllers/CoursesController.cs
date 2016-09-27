@@ -3,6 +3,8 @@
 using CoursesAPI.Models;
 using CoursesAPI.Services.DataAccess;
 using CoursesAPI.Services.Services;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace CoursesAPI.Controllers
 {
@@ -17,11 +19,12 @@ namespace CoursesAPI.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult GetCoursesBySemester(string semester = null, int page = 1)
+		public IActionResult GetCoursesBySemester( string semester = null, int page = 1)
 		{
 			// TODO: figure out the requested language (if any!)
 			// and pass it to the service provider!
-			return Ok(_service.GetCourseInstancesBySemester(semester, page));
+			string language = Request.Headers["Accept-Language"]; 
+			return Ok(_service.GetCourseInstancesBySemester(language, semester, page));
 		}
 
 		/// <summary>

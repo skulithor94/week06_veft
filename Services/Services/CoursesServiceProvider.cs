@@ -4,6 +4,9 @@ using CoursesAPI.Models;
 using CoursesAPI.Services.DataAccess;
 using CoursesAPI.Services.Exceptions;
 using CoursesAPI.Services.Models.Entities;
+using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace CoursesAPI.Services.Services
 {
@@ -18,6 +21,7 @@ namespace CoursesAPI.Services.Services
 		private int objectsPerPage;
 		private int pageCount;
 		private int pageNumber;
+		private string language;
 
 		public CoursesServiceProvider(IUnitOfWork uow)
 		{
@@ -51,24 +55,44 @@ namespace CoursesAPI.Services.Services
 		/// </summary>
 		/// <param name="semester"></param>
 		/// <returns></returns>
-		public dynamic GetCourseInstancesBySemester(string semester = null, int page = 1)
+		public dynamic GetCourseInstancesBySemester(string request, string semester = null, int page = 1)
 		{
+			List<CourseInstanceDTO> courses;
+			Console.Write("BLAAAAA");
+			//string AcceptLanguage = request.Headers.AcceptLanguage.ToString();
+			//Console.Write(AcceptLanguage);
+			if(request.Contains("en"))
+				language = "en";
+			else 
+				language = "is";
 
 			if (string.IsNullOrEmpty(semester))
 			{
 				semester = "20153";
 			}
-
-			var courses = ( // I'll never understand why people place code inline after the (
-				from c in _courseInstances.All()
-				join ct in _courseTemplates.All() on c.CourseID equals ct.CourseID				
-				where c.SemesterID == semester
-				select new CourseInstanceDTO 
-				{
-					Name               = ct.Name,
-					TemplateID         = ct.CourseID,
-					CourseInstanceID   = c.ID					
-			}).ToList();
+			if(language == "en"){
+				courses = ( // I'll never understand why people place code inline after the (
+					from c in _courseInstances.All()
+					join ct in _courseTemplates.All() on c.CourseID equals ct.CourseID				
+					where c.SemesterID == semester
+					select new CourseInstanceDTO 
+					{
+						Name               = ct.NameEN,
+						TemplateID         = ct.CourseID,
+						CourseInstanceID   = c.ID					
+					}).ToList();
+			}else{//language is icelandic
+				courses = ( 
+					from c in _courseInstances.All()
+					join ct in _courseTemplates.All() on c.CourseID equals ct.CourseID				
+					where c.SemesterID == semester
+					select new CourseInstanceDTO 
+					{
+						Name               = ct.Name,
+						TemplateID         = ct.CourseID,
+						CourseInstanceID   = c.ID					
+					}).ToList();
+			}
 
 			// Applying MainTeacher Names			
 			foreach(var course in courses){				 
